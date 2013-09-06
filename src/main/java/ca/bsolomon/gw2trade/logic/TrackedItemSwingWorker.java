@@ -40,14 +40,14 @@ public class TrackedItemSwingWorker extends SwingWorker<Void, TrackedListingChan
 						TradeListing listing = sellListing.get(0);
 						
 						System.out.println("Added "+listing.getQuantity()+" - "+listing.getUnit_price());
-						publish(new TrackedListingChange(listing.getQuantity(), item.getName(), listing.getUnit_price()));
+						publish(new TrackedListingChange(listing.getQuantity(), item.getName(), listing.getUnit_price(), true, true));
 					}
 					
 					int diff = sellListing.get(index).getQuantity() - lastSellListing.get(0).getQuantity();
 					
 					if (diff > 0) {
 						System.out.println("Added "+diff+" - "+lastSellListing.get(0).getUnit_price());
-						publish(new TrackedListingChange(diff, item.getName(), lastSellListing.get(0).getUnit_price()));
+						publish(new TrackedListingChange(diff, item.getName(), lastSellListing.get(0).getUnit_price(), true, true));
 					}
 				} else {
 					

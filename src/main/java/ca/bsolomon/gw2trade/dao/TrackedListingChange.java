@@ -5,12 +5,16 @@ public class TrackedListingChange {
 	private int count;
 	private String name;
 	private int price;
+	private boolean sale; 
+	private boolean added;
 	
-	public TrackedListingChange(int count, String name, int price) {
+	public TrackedListingChange(int count, String name, int price, boolean sale, boolean added) {
 		super();
 		this.count = count;
 		this.name = name;
 		this.price = price;
+		this.sale = sale;
+		this.added = added;
 	}
 	
 	public int getCount() {
@@ -33,6 +37,25 @@ public class TrackedListingChange {
 	}
 	
 	public String toString() {
-		return name+" "+count+" "+price;
+		if (added)
+			return count+" "+name+" listed for "+price;
+		else
+			return count+" "+name+" bought for "+price;
+	}
+
+	public boolean isSale() {
+		return sale;
+	}
+
+	public void setSale(boolean sale) {
+		this.sale = sale;
+	}
+
+	public boolean isAdded() {
+		return added;
+	}
+
+	public void setAdded(boolean added) {
+		this.added = added;
 	}
 }

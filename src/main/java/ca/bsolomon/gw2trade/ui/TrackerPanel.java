@@ -51,7 +51,7 @@ public class TrackerPanel extends JPanel implements ActionListener {
 		add(itemCB, "cell 1 1,growx");
 		
 		trackedSales = new TrackedSales();
-		add(trackedSales, "cell 0 2,grow");
+		add(trackedSales, "cell 0 2 2 1,grow");
 	}
 
 	public void actionPerformed(ActionEvent e) {
@@ -63,6 +63,7 @@ public class TrackerPanel extends JPanel implements ActionListener {
 			List<TradeItem> items = mainWindow.getConn().search(searchText);
 			
 			itemCB.setModel(new DefaultComboBoxModel<TradeItem>(items.toArray(new TradeItem[items.size()])));
+			mainWindow.getConn().setSelectedItem(items.get(0));
 		} else if (source.equals(itemCB)) {
 			TradeItem selectedItem = (TradeItem)itemCB.getSelectedItem();
 			mainWindow.getConn().setSelectedItem(selectedItem);
