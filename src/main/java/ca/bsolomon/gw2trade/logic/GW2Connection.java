@@ -12,6 +12,9 @@ public class GW2Connection {
 	private GW2TradeAPI api = new GW2TradeAPI();
 	private TradeItem selectedItem;
 
+	private List<TradeListing> sellListing = new ArrayList<>();
+	private List<TradeListing> buyListing = new ArrayList<>();
+	
 	public boolean login(String username, String password) {
 		return api.login(username, password);
 	}
@@ -24,17 +27,19 @@ public class GW2Connection {
 		this.selectedItem = selectedItem;
 	}
 
-	public List<TradeListing> getSellListings() {
+	public List<TradeListing> getNewSellListings() {
 		if (selectedItem != null) {
-			return api.getSellListings(selectedItem);
+			sellListing = api.getSellListings(selectedItem);
+			return sellListing;
 		}
 		
 		return new ArrayList<>();
 	}
 	
-	public List<TradeListing> getBuyListings() {
+	public List<TradeListing> getNewBuyListings() {
 		if (selectedItem != null) {
-			return api.getBuyListings(selectedItem);
+			buyListing = api.getBuyListings(selectedItem);
+			return buyListing;
 		}
 		
 		return new ArrayList<>();
@@ -42,5 +47,13 @@ public class GW2Connection {
 
 	public TradeItem getSelectedItem() {
 		return selectedItem;
+	}
+
+	public List<TradeListing> getSellListing() {
+		return sellListing;
+	}
+
+	public List<TradeListing> getBuyListing() {
+		return buyListing;
 	}
 }

@@ -41,7 +41,7 @@ public class GW2TradeMainWindow extends JFrame implements WindowListener{
 
 	public static void main(String[] args) {
 		GW2TradeMainWindow window = new GW2TradeMainWindow();
-		window.setPreferredSize(new Dimension(640, 480));
+		window.setPreferredSize(new Dimension(800, 640));
 		window.pack();
 		window.setVisible(true);
 		

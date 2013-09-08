@@ -29,15 +29,15 @@ public class TrackedItemSwingWorker extends SwingWorker<Void, TrackedListingChan
 				lastBuyListing = null;
 			}
 			
-			List<TradeListing> sellListing = mainWindow.getConn().getSellListings();
-			List<TradeListing> buyListing = mainWindow.getConn().getBuyListings();	
+			List<TradeListing> sellListing = mainWindow.getConn().getNewSellListings();
+			List<TradeListing> buyListing = mainWindow.getConn().getNewBuyListings();	
 			
-			if (lastSellListing != null) {
+			if (lastSellListing != null && sellListing != null && lastSellListing.size() > 0 && sellListing.size() > 0) {
 				int index = sellListing.indexOf(lastSellListing.get(0));
 				
 				if (index != -1) {
 					for (int i=0;i<index;i++) {
-						TradeListing listing = sellListing.get(0);
+						TradeListing listing = sellListing.get(i);
 						
 						System.out.println("Added "+listing.getQuantity()+" - "+listing.getUnit_price());
 						publish(new TrackedListingChange(listing.getQuantity(), item.getName(), listing.getUnit_price(), true, true));
@@ -48,9 +48,28 @@ public class TrackedItemSwingWorker extends SwingWorker<Void, TrackedListingChan
 					if (diff > 0) {
 						System.out.println("Added "+diff+" - "+lastSellListing.get(0).getUnit_price());
 						publish(new TrackedListingChange(diff, item.getName(), lastSellListing.get(0).getUnit_price(), true, true));
+					} else if (diff < 0) {
+						System.out.println("Removed "+diff+" - "+lastSellListing.get(0).getUnit_price());
+						publish(new TrackedListingChange(diff*-1, item.getName(), lastSellListing.get(0).getUnit_price(), true, false));
 					}
 				} else {
+					index = lastSellListing.indexOf(sellListing.get(0));
 					
+					if (index != -1) {
+						for (int i=0;i<index;i++) {
+							TradeListing listing = lastSellListing.get(i);
+							
+							System.out.println("Removed "+listing.getQuantity()+" - "+listing.getUnit_price());
+							publish(new TrackedListingChange(listing.getQuantity(), item.getName(), listing.getUnit_price(), true, false));
+						}
+						
+						int diff = lastSellListing.get(index).getQuantity() - sellListing.get(0).getQuantity();
+						
+						if (diff > 0) {
+							System.out.println("Removed "+diff+" - "+sellListing.get(0).getUnit_price());
+							publish(new TrackedListingChange(diff, item.getName(), sellListing.get(0).getUnit_price(), true, false));
+						}
+					}
 				}
 			}
 			

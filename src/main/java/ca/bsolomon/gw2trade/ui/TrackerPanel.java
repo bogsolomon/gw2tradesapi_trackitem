@@ -64,13 +64,15 @@ public class TrackerPanel extends JPanel implements ActionListener {
 			
 			itemCB.setModel(new DefaultComboBoxModel<TradeItem>(items.toArray(new TradeItem[items.size()])));
 			mainWindow.getConn().setSelectedItem(items.get(0));
+			trackedSales.clear();
 		} else if (source.equals(itemCB)) {
 			TradeItem selectedItem = (TradeItem)itemCB.getSelectedItem();
 			mainWindow.getConn().setSelectedItem(selectedItem);
+			trackedSales.clear();
 		}
 	}
 
 	public void addChange(List<TrackedListingChange> changes) {
-		trackedSales.addChange(changes);
+		trackedSales.addChange(changes, mainWindow.getConn().getSellListing(), mainWindow.getConn().getBuyListing());
 	}
 }
