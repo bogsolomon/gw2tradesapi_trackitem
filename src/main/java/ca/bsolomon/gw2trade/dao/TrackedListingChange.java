@@ -1,5 +1,7 @@
 package ca.bsolomon.gw2trade.dao;
 
+import java.text.DecimalFormat;
+
 public class TrackedListingChange {
 
 	private int count;
@@ -38,9 +40,9 @@ public class TrackedListingChange {
 	
 	public String toString() {
 		if (added)
-			return count+" "+name+" listed for "+price/10000+"."+(price/100)%100+"."+price%100;
+			return count+" "+name+" listed for "+customFormat("##",price/10000)+"."+customFormat("##",(price/100)%100)+"."+customFormat("##",price%100);
 		else
-			return count+" "+name+" bought for "+price;
+			return count+" "+name+" bought for "+customFormat("##",price/10000)+"."+customFormat("##",(price/100)%100)+"."+customFormat("##",price%100);
 	}
 
 	public boolean isSale() {
@@ -58,4 +60,9 @@ public class TrackedListingChange {
 	public void setAdded(boolean added) {
 		this.added = added;
 	}
+	static public String customFormat(String pattern, double value ) {
+	      DecimalFormat myFormatter = new DecimalFormat(pattern);
+	      myFormatter.setMinimumIntegerDigits(2);
+	      return myFormatter.format(value);
+	   }
 }
