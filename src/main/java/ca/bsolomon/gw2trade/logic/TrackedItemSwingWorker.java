@@ -73,6 +73,8 @@ public class TrackedItemSwingWorker extends SwingWorker<Void, TrackedListingChan
 				}
 			}
 			
+			publish((TrackedListingChange)null);
+			
 			lastSellListing = sellListing;
 			
 			Thread.sleep(5000);

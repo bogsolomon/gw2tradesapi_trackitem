@@ -38,7 +38,7 @@ public class TrackedListingChange {
 	
 	public String toString() {
 		if (added)
-			return count+" "+name+" listed for "+price;
+			return count+" "+name+" listed for "+price/10000+"."+(price/100)%100+"."+price%100;
 		else
 			return count+" "+name+" bought for "+price;
 	}

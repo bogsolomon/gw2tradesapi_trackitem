@@ -52,12 +52,16 @@ public class TrackedSales extends JPanel {
 	private JPanel panel_2;
 	private TimeSeries salesTimeSeries = new TimeSeries("Sale Prices");
 	private TimeSeries volumeTimeSeries = new TimeSeries("Volume");
+	private JScrollPane scrollPane_2;
 
 	public TrackedSales() {
-		setLayout(new MigLayout("", "[grow][grow][grow]", "[grow][grow]"));
+		setLayout(new MigLayout("", "[250px][grow][grow]", "[grow][grow]"));
+		
+		scrollPane_2 = new JScrollPane();
+		add(scrollPane_2, "cell 0 0,grow");
 
 		list = new JList<TrackedListingChange>(model);
-		add(list, "cell 0 0,grow");
+		scrollPane_2.setViewportView(list);
 
 		JPanel panel = new JPanel();
 		panel.setBorder(new TitledBorder(null, "Sell Offers",
@@ -89,26 +93,32 @@ public class TrackedSales extends JPanel {
 
 	public void addChange(List<TrackedListingChange> changes,
 			List<TradeListing> sellOffers, List<TradeListing> buyOffers) {
-		for (TrackedListingChange change : changes) {
-			model.add(0, change);
+		if (changes != null) {
+			for (TrackedListingChange change : changes) {
+				model.add(0, change);
+			}
 		}
 
-		List<TradeListing> items = new ArrayList<>(sellOffers.subList(0, 20));
-
-		// Collections.reverse(items);
-
-		modelSellOffers.setOffers(items);
-		modelSellOffers.fireTableDataChanged();
-
-		salesTimeSeries.add(new Second(), items.get(0).getUnit_price());
-		volumeTimeSeries.add(new Second(), items.get(0).getQuantity());
+		if(sellOffers.size() != 0) {
+			List<TradeListing> items = new ArrayList<>(sellOffers.subList(0, Math.min(20, sellOffers.size())));
+	
+			// Collections.reverse(items);
+	
+			modelSellOffers.setOffers(items);
+			modelSellOffers.fireTableDataChanged();
+	
+			salesTimeSeries.add(new Second(), items.get(0).getUnit_price());
+			volumeTimeSeries.add(new Second(), items.get(0).getQuantity());
+		}
 		
-		items = new ArrayList<>(buyOffers.subList(0, 20));
-
-		// Collections.reverse(items);
-
-		modelBuyOffers.setOffers(items);
-		modelBuyOffers.fireTableDataChanged();
+		if(buyOffers.size() != 0) {
+			List<TradeListing> items = new ArrayList<>(buyOffers.subList(0, Math.min(20, buyOffers.size())));
+	
+			// Collections.reverse(items);
+	
+			modelBuyOffers.setOffers(items);
+			modelBuyOffers.fireTableDataChanged();
+		}
 	}
 
 	private JFreeChart buildPriceVolumeChart(TimeSeriesCollection priceDataset,
