@@ -3,6 +3,8 @@ package ca.bsolomon.gw2trade.logic;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+
 import ca.bsolomon.gw2event.api.GW2TradeAPI;
 import ca.bsolomon.gw2event.api.dao.TradeItem;
 import ca.bsolomon.gw2event.api.dao.TradeListing;
@@ -20,7 +22,10 @@ public class GW2Connection {
 	}
 
 	public List<TradeItem> search(String searchText) {
-		return api.searchItems(searchText);
+		if (StringUtils.isNumeric(searchText))
+			return api.searchItems(Integer.parseInt(searchText));
+		else
+			return api.searchItems(searchText);
 	}
 
 	public void setSelectedItem(TradeItem selectedItem) {

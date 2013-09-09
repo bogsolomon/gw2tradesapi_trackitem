@@ -77,7 +77,7 @@ public class TrackedItemSwingWorker extends SwingWorker<Void, TrackedListingChan
 			
 			lastSellListing = sellListing;
 			
-			Thread.sleep(5000);
+			Thread.sleep(10000);
 		}
 		
 		return null;

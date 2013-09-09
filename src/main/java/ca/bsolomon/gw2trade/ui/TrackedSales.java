@@ -1,6 +1,8 @@
 package ca.bsolomon.gw2trade.ui;
 
 import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -8,7 +10,9 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.swing.DefaultListModel;
+import javax.swing.JButton;
 import javax.swing.JPanel;
+import javax.swing.ScrollPaneConstants;
 
 import net.miginfocom.swing.MigLayout;
 
@@ -18,6 +22,7 @@ import ca.bsolomon.gw2event.api.dao.TradeListing;
 import ca.bsolomon.gw2trade.dao.TrackedListingChange;
 
 import javax.swing.border.TitledBorder;
+import javax.swing.table.TableModel;
 import javax.swing.JTable;
 import javax.swing.JScrollPane;
 
@@ -55,7 +60,7 @@ public class TrackedSales extends JPanel {
 	private JScrollPane scrollPane_2;
 
 	public TrackedSales() {
-		setLayout(new MigLayout("", "[250px][grow][grow]", "[grow][grow]"));
+		setLayout(new MigLayout("", "[475px][grow][grow]", "[grow][grow]"));
 		
 		scrollPane_2 = new JScrollPane();
 		add(scrollPane_2, "cell 0 0,grow");
@@ -69,10 +74,10 @@ public class TrackedSales extends JPanel {
 		add(panel, "cell 1 0,grow");
 		panel.setLayout(new MigLayout("", "[grow]", "[grow]"));
 
-		scrollPane = new JScrollPane();
-		panel.add(scrollPane, "cell 0 0,grow");
-
 		table = new JTable(modelSellOffers);
+		scrollPane = createPagingScrollPaneForTable(table);
+		panel.add(scrollPane, "cell 0 0,grow");
+		
 		scrollPane.setViewportView(table);
 
 		panel_1 = new JPanel();
@@ -81,10 +86,10 @@ public class TrackedSales extends JPanel {
 		add(panel_1, "cell 2 0,grow");
 		panel_1.setLayout(new MigLayout("", "[452px]", "[427px]"));
 
-		scrollPane_1 = new JScrollPane();
+		table_1 = new JTable(modelBuyOffers);
+		scrollPane_1 = createPagingScrollPaneForTable(table_1);
 		panel_1.add(scrollPane_1, "cell 0 0,alignx left,aligny top");
 
-		table_1 = new JTable(modelBuyOffers);
 		scrollPane_1.setViewportView(table_1);
 
 		panel_2 = new ChartPanel(buildPriceVolumeChart(new TimeSeriesCollection(salesTimeSeries), new TimeSeriesCollection(volumeTimeSeries), "Sales"));
@@ -100,24 +105,36 @@ public class TrackedSales extends JPanel {
 		}
 
 		if(sellOffers.size() != 0) {
-			List<TradeListing> items = new ArrayList<>(sellOffers.subList(0, Math.min(20, sellOffers.size())));
-	
-			// Collections.reverse(items);
-	
-			modelSellOffers.setOffers(items);
+			modelSellOffers.setOffers(sellOffers);
 			modelSellOffers.fireTableDataChanged();
 	
-			salesTimeSeries.add(new Second(), items.get(0).getUnit_price());
-			volumeTimeSeries.add(new Second(), items.get(0).getQuantity());
+			salesTimeSeries.add(new Second(), sellOffers.get(0).getUnit_price());
+			volumeTimeSeries.add(new Second(), sellOffers.get(0).getQuantity());
+			
+			 if (modelSellOffers.getPageCount() <= 1 || modelSellOffers.getPageOffset() == 0) {
+				 scrollPane.getCorner(ScrollPaneConstants.UPPER_RIGHT_CORNER).setEnabled(false);
+			 } else {
+				 scrollPane.getCorner(ScrollPaneConstants.UPPER_RIGHT_CORNER).setEnabled(true);
+			 }
+			 
+			 if (modelSellOffers.getPageCount() <= 1) {
+				 scrollPane.getCorner(ScrollPaneConstants.LOWER_RIGHT_CORNER).setEnabled(false);
+			 } else if(modelSellOffers.getPageOffset() != modelSellOffers.getPageCount()-1){
+				 scrollPane.getCorner(ScrollPaneConstants.LOWER_RIGHT_CORNER).setEnabled(true);
+			 }
 		}
 		
 		if(buyOffers.size() != 0) {
-			List<TradeListing> items = new ArrayList<>(buyOffers.subList(0, Math.min(20, buyOffers.size())));
-	
 			// Collections.reverse(items);
 	
-			modelBuyOffers.setOffers(items);
+			modelBuyOffers.setOffers(buyOffers);
 			modelBuyOffers.fireTableDataChanged();
+			
+			if (modelBuyOffers.getPageCount() <= 1) {
+				 scrollPane_1.getCorner(ScrollPaneConstants.UPPER_RIGHT_CORNER).setEnabled(false);
+			 } else {
+				 scrollPane_1.getCorner(ScrollPaneConstants.UPPER_RIGHT_CORNER).setEnabled(true);
+			 }
 		}
 	}
 
@@ -162,4 +179,61 @@ public class TrackedSales extends JPanel {
 		modelBuyOffers.setOffers(new ArrayList<TradeListing>());
 		modelBuyOffers.fireTableDataChanged();
 	}
+	
+	// We provide our own version of a scrollpane that includes
+	  // the page up and page down buttons by default.
+	  public static JScrollPane createPagingScrollPaneForTable(JTable jt) {
+	    JScrollPane jsp = new JScrollPane(jt);
+	    TableModel tmodel = jt.getModel();
+
+	    // Don't choke if this is called on a regular table . . .
+	    if (!(tmodel instanceof OfferTableModel)) {
+	      return jsp;
+	    }
+
+	    // Okay, go ahead and build the real scrollpane
+	    final OfferTableModel model = (OfferTableModel) tmodel;
+	    final JButton upButton = new JButton(new ArrowIcon(ArrowIcon.UP));
+	    upButton.setEnabled(false); // starts off at 0, so can't go up
+	    final JButton downButton = new JButton(new ArrowIcon(ArrowIcon.DOWN));
+	    if (model.getPageCount() <= 1) {
+	      downButton.setEnabled(false); // One page...can't scroll down
+	    }
+
+	    upButton.addActionListener(new ActionListener() {
+	      public void actionPerformed(ActionEvent ae) {
+	        model.pageUp();
+
+	        // If we hit the top of the data, disable the up button.
+	        if (model.getPageOffset() == 0) {
+	          upButton.setEnabled(false);
+	        }
+	        downButton.setEnabled(true);
+	      }
+	    });
+
+	    downButton.addActionListener(new ActionListener() {
+	      public void actionPerformed(ActionEvent ae) {
+	        model.pageDown();
+
+	        // If we hit the bottom of the data, disable the down button.
+	        if (model.getPageOffset() == (model.getPageCount() - 1)) {
+	          downButton.setEnabled(false);
+	        }
+	        upButton.setEnabled(true);
+	      }
+	    });
+
+	    // Turn on the scrollbars; otherwise we won't get our corners.
+	    jsp
+	        .setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+	    jsp
+	        .setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+
+	    // Add in the corners (page up/down).
+	    jsp.setCorner(ScrollPaneConstants.UPPER_RIGHT_CORNER, upButton);
+	    jsp.setCorner(ScrollPaneConstants.LOWER_RIGHT_CORNER, downButton);
+
+	    return jsp;
+	  }
 }

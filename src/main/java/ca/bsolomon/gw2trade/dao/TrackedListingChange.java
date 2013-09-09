@@ -10,6 +10,8 @@ public class TrackedListingChange {
 	private boolean sale; 
 	private boolean added;
 	
+	private static DecimalFormat myFormatter = new DecimalFormat("##");
+	
 	public TrackedListingChange(int count, String name, int price, boolean sale, boolean added) {
 		super();
 		this.count = count;
@@ -40,9 +42,9 @@ public class TrackedListingChange {
 	
 	public String toString() {
 		if (added)
-			return count+" "+name+" listed for "+customFormat("##",price/10000)+"."+customFormat("##",(price/100)%100)+"."+customFormat("##",price%100);
+			return count+" "+name+" listed for "+customFormat(price);
 		else
-			return count+" "+name+" bought for "+customFormat("##",price/10000)+"."+customFormat("##",(price/100)%100)+"."+customFormat("##",price%100);
+			return count+" "+name+" bought for "+customFormat(price);
 	}
 
 	public boolean isSale() {
@@ -60,9 +62,8 @@ public class TrackedListingChange {
 	public void setAdded(boolean added) {
 		this.added = added;
 	}
-	static public String customFormat(String pattern, double value ) {
-	      DecimalFormat myFormatter = new DecimalFormat(pattern);
-	      myFormatter.setMinimumIntegerDigits(2);
-	      return myFormatter.format(value);
-	   }
+	static public String customFormat(double value) {
+		myFormatter.setMinimumIntegerDigits(2);  
+		return myFormatter.format((int)value/10000)+"."+myFormatter.format((int)(value/100)%100)+"."+myFormatter.format(value%100);
+	}
 }
