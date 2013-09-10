@@ -30,28 +30,32 @@ public class TrackerPanel extends JPanel implements ActionListener {
 	private JTextField searchTF;
 	private JComboBox<TradeItem> itemCB;
 	private TrackedSales trackedSales;
+	private SupplyDemandPanel supplyDemandPanel;
 	
 	public TrackerPanel(GW2TradeMainWindow mainWindow) {
 		this.mainWindow = mainWindow;
-		setLayout(new MigLayout("", "[grow][grow]", "[][][grow]"));
+		setLayout(new MigLayout("", "[grow][grow][grow]", "[grow][][grow]"));
+		
+		supplyDemandPanel = new SupplyDemandPanel();
+		add(supplyDemandPanel, "cell 0 0 1 2,grow");
 		
 		JLabel lblSearch = new JLabel("Search:");
-		add(lblSearch, "cell 0 0,alignx trailing");
+		add(lblSearch, "cell 1 0,alignx trailing");
 		
 		searchTF = new JTextField();
 		searchTF.addActionListener(this);
-		add(searchTF, "cell 1 0,growx");
+		add(searchTF, "cell 2 0,growx");
 		searchTF.setColumns(10);
 		
 		JLabel lblItems = new JLabel("Items:");
-		add(lblItems, "cell 0 1,alignx trailing");
+		add(lblItems, "cell 1 1,alignx trailing");
 		
 		itemCB = new JComboBox<>();
 		itemCB.addActionListener(this);
-		add(itemCB, "cell 1 1,growx");
+		add(itemCB, "cell 2 1,growx");
 		
 		trackedSales = new TrackedSales();
-		add(trackedSales, "cell 0 2 2 1,grow");
+		add(trackedSales, "cell 0 2 3 1,grow");
 	}
 
 	public void actionPerformed(ActionEvent e) {
@@ -65,14 +69,17 @@ public class TrackerPanel extends JPanel implements ActionListener {
 			itemCB.setModel(new DefaultComboBoxModel<TradeItem>(items.toArray(new TradeItem[items.size()])));
 			mainWindow.getConn().setSelectedItem(items.get(0));
 			trackedSales.clear();
+			supplyDemandPanel.clear();
 		} else if (source.equals(itemCB)) {
 			TradeItem selectedItem = (TradeItem)itemCB.getSelectedItem();
 			mainWindow.getConn().setSelectedItem(selectedItem);
 			trackedSales.clear();
+			supplyDemandPanel.clear();
 		}
 	}
 
 	public void addChange(List<TrackedListingChange> changes) {
 		trackedSales.addChange(changes, mainWindow.getConn().getSellListing(), mainWindow.getConn().getBuyListing());
+		supplyDemandPanel.setValues(mainWindow.getConn().getSellListing(), mainWindow.getConn().getBuyListing());
 	}
 }

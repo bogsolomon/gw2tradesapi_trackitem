@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -20,6 +22,7 @@ import javax.swing.JList;
 
 import ca.bsolomon.gw2event.api.dao.TradeListing;
 import ca.bsolomon.gw2trade.dao.TrackedListingChange;
+import ca.bsolomon.gw2trade.util.MultipleGroupingDecimalFormat;
 
 import javax.swing.border.TitledBorder;
 import javax.swing.table.TableModel;
@@ -146,13 +149,16 @@ public class TrackedSales extends JPanel {
 		XYPlot plot = chart.getXYPlot();
 		NumberAxis rangeAxis1 = (NumberAxis) plot.getRangeAxis();
 		rangeAxis1.setLowerMargin(0.40); // to leave room for volume bars
-		DecimalFormat format = new DecimalFormat("00.00");
+		DecimalFormatSymbols unusualSymbols = new DecimalFormatSymbols();
+		unusualSymbols.setGroupingSeparator('.');
+		unusualSymbols.setDecimalSeparator(',');
+		NumberFormat format = new MultipleGroupingDecimalFormat();
 		rangeAxis1.setNumberFormatOverride(format);
 
 		XYItemRenderer renderer1 = plot.getRenderer();
 		renderer1.setBaseToolTipGenerator(new StandardXYToolTipGenerator(
 				StandardXYToolTipGenerator.DEFAULT_TOOL_TIP_FORMAT,
-				new SimpleDateFormat("d-MMM-yyyy"), new DecimalFormat("0.00")));
+				new SimpleDateFormat("d-MMM-yyyy"), format));
 
 		NumberAxis rangeAxis2 = new NumberAxis("Volume");
 		rangeAxis2.setUpperMargin(1.00); // to leave room for price line
